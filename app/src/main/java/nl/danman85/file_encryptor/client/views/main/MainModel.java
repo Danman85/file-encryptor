@@ -1,8 +1,18 @@
 package nl.danman85.file_encryptor.client.views.main;
 
-import java.util.Observable;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 
-public class MainModel extends Observable {
+public class MainModel implements Observable {
 
 
+    @Override
+    public void addListener(final InvalidationListener listener) {
+
+    }
+
+    @Override
+    public void removeListener(final InvalidationListener listener) {
+
+    }
 }

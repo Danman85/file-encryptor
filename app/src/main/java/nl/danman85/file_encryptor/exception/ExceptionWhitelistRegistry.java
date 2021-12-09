@@ -13,6 +13,6 @@ public final class ExceptionWhitelistRegistry {
         // hide me
     }
 
-    public static final Class<? extends Exception>[] WHITE_FLAGGED = new Class[] {
+    public static final Class[] WHITE_FLAGGED = new Class[] {
     };
 }

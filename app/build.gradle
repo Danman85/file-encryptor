@@ -25,6 +25,17 @@ dependencies {
     implementation "org.apache.logging.log4j:log4j-core:${log4j_version}"
     implementation "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_version}"
 
+    // https://mvnrepository.com/artifact/org.openjfx/
+    def javafx_version = '11.0.2'
+    implementation "org.openjfx:javafx-base:${javafx_version}"
+    implementation "org.openjfx:javafx-controls:${javafx_version}"
+    implementation "org.openjfx:javafx-fxml:${javafx_version}"
+    implementation "org.openjfx:javafx-graphics:${javafx_version}"
+    implementation "org.openjfx:javafx-media:${javafx_version}"
+    implementation "org.openjfx:javafx-swing:${javafx_version}"
+    implementation "org.openjfx:javafx-web:${javafx_version}"
+
+
     testImplementation 'org.junit.jupiter:junit-jupiter:5.7.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testImplementation 'org.mockito:mockito-junit-jupiter:4.0.0'
@@ -37,7 +48,6 @@ application {
 
 javafx {
     version = '11.0.2'
-    sdk = 'C:/Java/openjfx-11.0.2_windows-x64_bin-sdk/javafx-sdk-11.0.2'
     modules = [
             'javafx.base',
             'javafx.controls',
