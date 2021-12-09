@@ -1,0 +1,15 @@
+@startuml
+'https://plantuml.com/sequence-diagram
+
+actor User as user
+participant Main as main
+participant "Start screen" as startScreen
+
+
+autonumber
+
+user -> main
+main -> startScreen
+main <-- startScreen
+user <-- main
+@enduml

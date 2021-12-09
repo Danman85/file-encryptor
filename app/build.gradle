@@ -1,0 +1,54 @@
+plugins {
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.10'
+}
+
+group = 'nl.danman85'
+version = '0.0.1-SNAPSHOT'
+
+sourceCompatibility = 11
+targetCompatibility = 11
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'com.google.guava:guava:30.1.1-jre'
+    implementation 'com.google.code.findbugs:jsr305:3.0.2'
+    // https://mvnrepository.com/artifact/commons-io/commons-io
+    implementation 'commons-io:commons-io:2.11.0'
+
+    // Logging: log4j2
+    def log4j_version = '2.13.3'
+    implementation "org.apache.logging.log4j:log4j-api:${log4j_version}"
+    implementation "org.apache.logging.log4j:log4j-core:${log4j_version}"
+    implementation "org.apache.logging.log4j:log4j-slf4j-impl:${log4j_version}"
+
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.7.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testImplementation 'org.mockito:mockito-junit-jupiter:4.0.0'
+    testImplementation 'org.hamcrest:hamcrest:2.2'
+}
+
+application {
+    mainClass = 'nl.danman85.file_encryptor.App'
+}
+
+javafx {
+    version = '11.0.2'
+    sdk = 'C:/Java/openjfx-11.0.2_windows-x64_bin-sdk/javafx-sdk-11.0.2'
+    modules = [
+            'javafx.base',
+            'javafx.controls',
+            'javafx.fxml',
+            'javafx.graphics',
+            'javafx.media',
+            'javafx.swing',
+            'javafx.web'
+    ]
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
