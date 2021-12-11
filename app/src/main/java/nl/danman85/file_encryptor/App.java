@@ -9,13 +9,9 @@ import javafx.stage.Stage;
 import nl.danman85.file_encryptor.client.Client;
 import nl.danman85.file_encryptor.client.configuration.ConfigException;
 import nl.danman85.file_encryptor.client.configuration.ConfigValidator;
-import nl.danman85.file_encryptor.client.views.FXMLLoaderFactory;
-import nl.danman85.file_encryptor.exception.ExceptionWhitelistRegistry;
+import nl.danman85.file_encryptor.exception.ExceptionLoggingHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.annotation.Nonnull;
-import java.util.Arrays;
 
 public class App extends Application {
 
@@ -27,19 +23,10 @@ public class App extends Application {
     }
 
     @Override
-    public void start(final Stage stage) throws Exception {
-
-        var exceptionHandler = new ApplicationExceptionLoggingHandler();
+    public void start(final Stage stage) {
 
         validateConfig();
-
-        try {
-            final var loaderFactory = new FXMLLoaderFactory();
-            final var client = new Client(loaderFactory);
-            client.start(stage);
-        } catch (final Exception e) {
-            exceptionHandler.handle(e);
-        }
+        startClient(stage);
     }
 
     private void validateConfig() {
@@ -52,27 +39,14 @@ public class App extends Application {
         }
     }
 
-    /**
-     * Handles logging for Exceptions.
-     *
-     * It is possible to white-list certain exceptions in the {@link ExceptionWhitelistRegistry}.
-     * If an exception is whitelisted, the application remains running. Be careful with this feature.
-     */
-    private static class ApplicationExceptionLoggingHandler {
+    private void startClient(final Stage stage) {
+        var exceptionHandler = new ExceptionLoggingHandler();
 
-        public static final Logger LOGGER = LoggerFactory.getLogger(App.class);
-
-        public void handle(@Nonnull final Exception e) {
-            logException(e);
-        }
-
-        private void logException(final Exception e) {
-            if (Arrays.stream(ExceptionWhitelistRegistry.WHITE_FLAGGED).noneMatch(whiteListedClass -> e.getClass().equals(whiteListedClass))) {
-                LOGGER.error("Uncaught Exception encountered, exiting application", e);
-                Platform.exit();
-            } else {
-                LOGGER.warn("Encountered white listed Exception, resuming activities", e);
-            }
+        try {
+            final var client = new Client();
+            client.start(stage);
+        } catch (final Exception e) {
+            exceptionHandler.handle(e);
         }
     }
 }
