@@ -40,11 +40,10 @@ public class FileEncryptorController implements Controller {
 
     private void initListeners() {
         this.fileLines.addListener((MapChangeListener<File, FileLineController>) change -> {
-            final Parent fileLineRoot = change.getValueAdded().getRoot();
             if (change.wasRemoved()) {
-                lineContainer.getChildren().remove(fileLineRoot);
+                lineContainer.getChildren().remove(change.getValueRemoved().getRoot());
             } else {
-                this.lineContainer.getChildren().add(fileLineRoot);
+                this.lineContainer.getChildren().add(change.getValueAdded().getRoot());
             }
         });
     }
@@ -55,7 +54,7 @@ public class FileEncryptorController implements Controller {
     }
 
     public void addNewFileLineToLineContainer() {
-        selectTextFile().ifPresent(this::addNewUniqueLineElementToListOfFileLines);
+        selectTextFile().ifPresent(this::addNewFileLineToListOfFileLines);
     }
 
     private Optional<File> selectTextFile() {
@@ -75,14 +74,20 @@ public class FileEncryptorController implements Controller {
         }
     }
 
-    private void addNewUniqueLineElementToListOfFileLines(@Nonnull final File file) {
-        try {
-            final var fileLineViewPair = VIEW_PAIR_FACTORY.getFileLineViewPair();
-            if (fileLinesDoesNotHaveLineForFile(file)) {
-                this.fileLines.put(file, fileLineViewPair.getValue());
+    private void addNewFileLineToListOfFileLines(@Nonnull final File file) {
+            if (isFileNotPresent(file)) {
+                initializeAndAddFileLine(file);
             } else {
                 AlertUtil.createAndShowInformationAlert("File already present");
             }
+    }
+
+    private void initializeAndAddFileLine(final File file){
+        try {
+            final var fileLineViewPair = VIEW_PAIR_FACTORY.getFileLineViewPair();
+            fileLineViewPair.getController().setFile(file);
+            fileLineViewPair.getController().getCloseButton().setOnAction(event -> removeFileLine(file, fileLineViewPair.getRoot()));
+            this.fileLines.put(file, fileLineViewPair.getController());
         } catch (ClientException e) {
             final String warningMessage = "Unable to add FileLine element for file=" + file.getPath();
             LOGGER.warn(warningMessage, e);
@@ -90,14 +95,11 @@ public class FileEncryptorController implements Controller {
         }
     }
 
-    private boolean fileLinesDoesNotHaveLineForFile(final File file) {
-//        boolean fileAlreadyPresent = false;
-//        synchronized (this.fileLines) {
-//            if (!this.fileLines.containsKey(file)) {
-//                fileAlreadyPresent = true;
-//            }
-//        }
-//        return fileAlreadyPresent;
+    private boolean isFileNotPresent(final File file) {
         return !this.fileLines.containsKey(file);
+    }
+
+    private void removeFileLine(final File file, final Parent root) {
+        this.fileLines.remove(file);
     }
 }

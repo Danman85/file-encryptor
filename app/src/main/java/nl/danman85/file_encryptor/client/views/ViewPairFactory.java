@@ -31,30 +31,30 @@ public class ViewPairFactory {
         return instance;
     }
 
-    public Pair<Parent, MainViewController> getMainViewPair() throws ClientException {
+    public ViewPair<MainViewController> getMainViewPair() throws ClientException {
         final var mainViewPair = getViewPairForViewResource(FXMLViewSource.MAIN_VIEW);
-        if (mainViewPair.getValue() instanceof MainViewController) {
-            return new Pair<>(mainViewPair.getKey(), (MainViewController) mainViewPair.getValue());
+        if (mainViewPair.getController() instanceof MainViewController) {
+            return new ViewPair<>(mainViewPair.getRoot(), (MainViewController) mainViewPair.getController());
         } else {
             final String warningMessage = "Could not create ViewPair for File Line, Controller is not of expected type=" + MainViewController.class;
             throw logWarningAndReturnClientExceptionForMessage(warningMessage);
         }
     }
 
-    public Pair<Parent, FileEncryptorController> getFileEncryptorViewPair() throws ClientException {
+    public ViewPair<FileEncryptorController> getFileEncryptorViewPair() throws ClientException {
         final var mainViewPair = getViewPairForViewResource(FXMLViewSource.FILE_ENCRYPTOR);
-        if (mainViewPair.getValue() instanceof FileEncryptorController) {
-            return new Pair<>(mainViewPair.getKey(), (FileEncryptorController) mainViewPair.getValue());
+        if (mainViewPair.getController() instanceof FileEncryptorController) {
+            return new ViewPair<>(mainViewPair.getRoot(), (FileEncryptorController) mainViewPair.getController());
         } else {
             final String warningMessage = "Could not create ViewPair for File Line, Controller is not of expected type=" + FileEncryptorController.class;
             throw logWarningAndReturnClientExceptionForMessage(warningMessage);
         }
     }
 
-    public Pair<Parent, FileLineController> getFileLineViewPair() throws ClientException {
+    public ViewPair<FileLineController> getFileLineViewPair() throws ClientException {
         final var mainViewPair = getViewPairForViewResource(FXMLViewSource.FILE_LINE);
-        if (mainViewPair.getValue() instanceof FileLineController) {
-            return new Pair<>(mainViewPair.getKey(), (FileLineController) mainViewPair.getValue());
+        if (mainViewPair.getController() instanceof FileLineController) {
+            return new ViewPair<>(mainViewPair.getRoot(), (FileLineController) mainViewPair.getController());
         } else {
             final String warningMessage = "Could not create ViewPair for File Line, Controller is not of expected type=" + FileLineController.class;
             throw logWarningAndReturnClientExceptionForMessage(warningMessage);
@@ -73,7 +73,7 @@ public class ViewPairFactory {
      * @throws ClientException exception
      */
     @Nonnull
-    private <C> Pair<Parent, C> getViewPairForViewResource(@Nonnull final FXMLViewSource fxmlViewSource) throws ClientException {
+    private <C extends Controller> ViewPair<C> getViewPairForViewResource(@Nonnull final FXMLViewSource fxmlViewSource) throws ClientException {
         final var loader = new FXMLLoader(Objects.requireNonNull(getClass().getResource(fxmlViewSource.getResourceUrl())));
         C controller;
         Parent root;
@@ -84,6 +84,6 @@ public class ViewPairFactory {
             LOGGER.warn("Unable to load view=" + fxmlViewSource.name(), e);
             throw new ClientException(e);
         }
-        return new Pair<>(root, controller);
+        return new ViewPair<>(root, controller);
     }
 }
