@@ -4,7 +4,6 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.layout.BorderPane;
 import nl.danman85.file_encryptor.client.ClientException;
-import nl.danman85.file_encryptor.client.configuration.FXMLViewSource;
 import nl.danman85.file_encryptor.client.views.Controller;
 import nl.danman85.file_encryptor.client.views.ViewPairFactory;
 import org.apache.logging.log4j.LogManager;
@@ -21,12 +20,8 @@ public class MainViewController implements Controller {
     public MainViewController() {
     }
 
-    public void initialize() {
-        try {
-            this.root.setCenter(viewPairFactory.getViewPairForViewResource(FXMLViewSource.FILE_ENCRYPTOR).getKey());
-        } catch (ClientException e) {
-            LOGGER.warn("Unable to load fileEncryptor view", e);
-        }
+    public void initialize() throws ClientException {
+        this.root.setCenter(viewPairFactory.getFileEncryptorViewPair().getKey());
     }
 
     @Override
