@@ -4,13 +4,13 @@
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="root" alignment="TOP_CENTER" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:id="root" alignment="TOP_CENTER" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="nl.danman85.file_encryptor.client.views.file_encryptor.FileEncryptorController">
    <children>
       <ToolBar prefHeight="40.0" VBox.vgrow="ALWAYS">
         <items>
-          <Button mnemonicParsing="false" text="New File" />
+          <Button fx:id="newFileButton" onAction="#addNewFileLineToLineContainer" mnemonicParsing="false" text="New File" />
         </items>
       </ToolBar>
-      <VBox prefWidth="100.0" VBox.vgrow="ALWAYS" />
+      <VBox fx:id="lineContainer" prefWidth="100.0" VBox.vgrow="ALWAYS" />
    </children>
 </VBox>

@@ -5,7 +5,6 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import nl.danman85.file_encryptor.App;
-import nl.danman85.file_encryptor.client.configuration.FXMLViewSource;
 import nl.danman85.file_encryptor.client.views.ViewPairFactory;
 import nl.danman85.file_encryptor.client.views.main.MainViewController;
 import org.slf4j.Logger;
@@ -40,7 +39,7 @@ public class Client {
     }
 
     private Parent createMainView() throws ClientException {
-        final Pair<Parent, MainViewController> viewPair = fxmlViewFactory.getViewPairForViewResource(FXMLViewSource.MAIN_VIEW);
+        final Pair<Parent, MainViewController> viewPair = fxmlViewFactory.getMainViewPair();
         return viewPair.getKey();
     }
 }
