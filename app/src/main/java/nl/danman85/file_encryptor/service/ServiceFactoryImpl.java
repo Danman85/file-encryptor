@@ -7,9 +7,11 @@ public class ServiceFactoryImpl implements ServiceFactory {
     private static ServiceFactory INSTANCE = null;
 
     private final FileService fileService;
+    private final AESEncryptionService aesEncryptionService;
 
     private ServiceFactoryImpl() {
-        this.fileService = new FileServiceImpl();
+        this.fileService = new FileService();
+        this.aesEncryptionService = new AESEncryptionService();
     }
 
     @Nonnull
@@ -22,7 +24,13 @@ public class ServiceFactoryImpl implements ServiceFactory {
 
     @Nonnull
     @Override
-    public FileService createFileService() {
+    public FileService getFileService() {
         return this.fileService;
+    }
+
+    @Nonnull
+    @Override
+    public AESEncryptionService getAesEncryptionService() {
+        return this.aesEncryptionService;
     }
 }

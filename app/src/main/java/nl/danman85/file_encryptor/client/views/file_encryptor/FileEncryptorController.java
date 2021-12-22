@@ -11,7 +11,7 @@ import javafx.stage.FileChooser;
 import nl.danman85.file_encryptor.client.ClientException;
 import nl.danman85.file_encryptor.client.views.Controller;
 import nl.danman85.file_encryptor.client.views.ViewPairFactory;
-import nl.danman85.file_encryptor.client.views.alerts.AlertUtil;
+import nl.danman85.file_encryptor.client.views.dialogs.AlertUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

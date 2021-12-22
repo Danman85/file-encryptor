@@ -17,9 +17,9 @@ import java.util.Objects;
 
 public class ViewPairFactory {
 
-    private static ViewPairFactory instance;
-
     private static final Logger LOGGER = LogManager.getLogger(ViewPairFactory.class);
+
+    private static ViewPairFactory instance;
 
     private ViewPairFactory() {
     }

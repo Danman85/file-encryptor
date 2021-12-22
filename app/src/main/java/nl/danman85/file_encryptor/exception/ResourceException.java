@@ -12,4 +12,6 @@ public class ResourceException extends Exception {
     public ResourceException(final String message, final Throwable cause) {
         super(message, cause);
     }
+
+    public ResourceException(final Throwable e) {}
 }

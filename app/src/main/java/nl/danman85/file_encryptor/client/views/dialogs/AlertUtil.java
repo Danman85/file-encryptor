@@ -1,4 +1,4 @@
-package nl.danman85.file_encryptor.client.views.alerts;
+package nl.danman85.file_encryptor.client.views.dialogs;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonType;
