@@ -21,7 +21,7 @@ public class MainViewController implements Controller {
     }
 
     public void initialize() throws ClientException {
-        this.root.setCenter(viewPairFactory.getFileEncryptorViewPair().getKey());
+        this.root.setCenter(viewPairFactory.getFileEncryptorViewPair().getRoot());
     }
 
     @Override

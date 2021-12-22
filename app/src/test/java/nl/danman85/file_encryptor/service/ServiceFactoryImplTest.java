@@ -25,7 +25,7 @@ public class ServiceFactoryImplTest {
     @Test
     void createFileService_returnsFileServiceObject() {
         // When
-        final FileService fileService = this.serviceFactory.createFileService();
+        final FileService fileService = this.serviceFactory.getFileService();
 
         // Then
         assertNotNull(fileService);

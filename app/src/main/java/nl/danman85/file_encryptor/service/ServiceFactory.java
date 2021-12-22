@@ -5,5 +5,8 @@ import javax.annotation.Nonnull;
 public interface ServiceFactory {
 
     @Nonnull
-    FileService createFileService();
+    FileService getFileService();
+
+    @Nonnull
+    AESEncryptionService getAesEncryptionService();
 }
