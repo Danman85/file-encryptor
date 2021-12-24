@@ -5,16 +5,19 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
+import nl.danman85.file_encryptor.client.ClientException;
+import nl.danman85.file_encryptor.client.model.EncryptionFile;
 import nl.danman85.file_encryptor.client.views.Controller;
 import nl.danman85.file_encryptor.client.views.dialogs.AlertUtil;
 import nl.danman85.file_encryptor.client.views.dialogs.PasswordDialog;
-import nl.danman85.file_encryptor.service.*;
+import nl.danman85.file_encryptor.service.ServiceException;
+import nl.danman85.file_encryptor.service.ServiceFactory;
+import nl.danman85.file_encryptor.service.ServiceFactoryImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
 import javax.crypto.SecretKey;
-import java.io.File;
 import java.util.Optional;
 
 public class FileLineController implements Controller {
@@ -30,16 +33,19 @@ public class FileLineController implements Controller {
     @FXML private Button encryptButton;
     @FXML private Button decryptButton;
 
-    private File file;
-    private final AESEncryptionService aesEncryptionService;
-    private final FileService fileService;
+    private EncryptionFile encryptionFile;
 
     public FileLineController() {
-        this.aesEncryptionService = SERVICE_FACTORY.getAesEncryptionService();
-        this.fileService = SERVICE_FACTORY.getFileService();
     }
 
     public void initialize() {
+        // Method called by JavaFX framework
+    }
+
+    public void init(@Nonnull final EncryptionFile encryptionFile) {
+        setEncryptionFile(encryptionFile);
+        this.encryptButton.disableProperty().bind(this.encryptionFile.getIsEncryptedProperty());
+        this.decryptButton.disableProperty().bind(this.encryptionFile.getIsEncryptedProperty().not());
     }
 
     @Override
@@ -63,14 +69,14 @@ public class FileLineController implements Controller {
         }
     }
 
-    public File getFile() {
-        return new File(file.getPath());
+    public EncryptionFile getFile() {
+        return this.encryptionFile;
     }
 
-    public void setFile(final File file) {
-        if (this.file == null) {
-            this.file = file;
-            this.fileLabel.setText(file.getName());
+    public void setEncryptionFile(final EncryptionFile encryptionFile) {
+        if (this.encryptionFile == null) {
+            this.encryptionFile = encryptionFile;
+            this.fileLabel.setText(encryptionFile.getFile().getName());
         }
     }
 
@@ -90,11 +96,9 @@ public class FileLineController implements Controller {
 
     private void encryptFileContents(@Nonnull final String password) {
         try {
-            final String plainFileContents = this.fileService.readTextFromFile(this.file);
-            final SecretKey key = this.aesEncryptionService.getKeyFromPassword(password, SALT);
-            final String cipheredText = this.aesEncryptionService.encryptWithPrefixIv(plainFileContents, key);
-            this.fileService.writeTextToFile(cipheredText, this.file);
-        } catch (ServiceException e) {
+            final SecretKey key = SERVICE_FACTORY.getAesEncryptionService().getKeyFromPassword(password, SALT);
+            this.encryptionFile.encrypt(key);
+        } catch (ClientException | ServiceException e) {
             final String warningMessage = "Unable to encrypt contents";
             LOGGER.warn(warningMessage, e);
             AlertUtil.createAndShowWarningAlert(warningMessage);
@@ -103,11 +107,9 @@ public class FileLineController implements Controller {
 
     private void decryptFileContents(final String password) {
         try {
-            final String plainFileContents = this.fileService.readTextFromFile(this.file);
-            final SecretKey key = this.aesEncryptionService.getKeyFromPassword(password, SALT);
-            final String cipheredText = this.aesEncryptionService.decryptWithPrefixIv(plainFileContents, key);
-            this.fileService.writeTextToFile(cipheredText, this.file);
-        } catch (ServiceException e) {
+            final SecretKey key = SERVICE_FACTORY.getAesEncryptionService().getKeyFromPassword(password, SALT);
+            this.encryptionFile.decrypt(key);
+        } catch (ClientException | ServiceException e) {
             final String warningMessage = "Unable to decrypt contents";
             LOGGER.warn(warningMessage, e);
             AlertUtil.createAndShowWarningAlert(warningMessage);
