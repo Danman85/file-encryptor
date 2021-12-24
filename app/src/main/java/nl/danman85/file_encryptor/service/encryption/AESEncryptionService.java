@@ -1,5 +1,8 @@
-package nl.danman85.file_encryptor.service;
+package nl.danman85.file_encryptor.service.encryption;
 
+import nl.danman85.file_encryptor.service.ServiceException;
+import nl.danman85.file_encryptor.service.ServiceFactory;
+import nl.danman85.file_encryptor.service.ServiceFactoryImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -9,6 +12,7 @@ import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
@@ -23,9 +27,12 @@ public class AESEncryptionService {
 
     private static final Logger LOGGER = LogManager.getLogger(AESEncryptionService.class);
 
+    private static final ServiceFactory SERVICE_FACTORY = ServiceFactoryImpl.getInstance();
+
     private static final String ALGORITHM = "AES/GCM/NoPadding";
     private static final int TAG_LENGTH = 128;
-    public static final int IV_BYTE_LENGTH = 16;
+    private static final int IV_BYTE_LENGTH = 16;
+    private static final String ENCRYPTION_TAG = "<==|| File Encryptor encrypted file ||==>";
 
     @Nonnull
     public SecretKey getKeyFromPassword(@Nonnull final String password,
@@ -45,6 +52,9 @@ public class AESEncryptionService {
     @Nonnull
     public String encryptWithPrefixIv(@Nonnull final String plainText,
                                       @Nonnull final SecretKey key) throws ServiceException {
+        if (areFileContentsEncrypted(plainText)) {
+            throw new ServiceException("Unable to encrypt an already encrypted text");
+        }
         final byte[] iv = generateIv();
         final byte[] cipheredText;
         try {
@@ -53,7 +63,7 @@ public class AESEncryptionService {
                     .put(iv)
                     .put(cipheredText)
                     .array();
-            return Base64.getEncoder().encodeToString(cipheredTexWithIv);
+            return ENCRYPTION_TAG + Base64.getEncoder().encodeToString(cipheredTexWithIv);
         } catch (NoSuchPaddingException | NoSuchAlgorithmException | InvalidAlgorithmParameterException
                 | InvalidKeyException | IllegalBlockSizeException | BadPaddingException e) {
             LOGGER.warn("Unable the encrypt text", e);
@@ -64,7 +74,14 @@ public class AESEncryptionService {
     @Nonnull
     public String decryptWithPrefixIv(@Nonnull final String cipheredText,
                                       @Nonnull final SecretKey key) throws ServiceException {
-        final ByteBuffer bb = ByteBuffer.wrap(Base64.getDecoder().decode(cipheredText.trim()));
+        final String deTaggedCipheredText;
+        if (areFileContentsEncrypted(cipheredText)) {
+            deTaggedCipheredText = removeEncryptionTagIfPresent(cipheredText.trim());
+        } else {
+            throw new ServiceException("Unable to decrypt an unencrypted text");
+        }
+
+        final ByteBuffer bb = ByteBuffer.wrap(Base64.getDecoder().decode(deTaggedCipheredText));
         final byte[] iv = new byte[IV_BYTE_LENGTH];
         bb.get(iv);
         final byte[] cipheredTextBytes = new byte[bb.remaining()];
@@ -79,6 +96,15 @@ public class AESEncryptionService {
             LOGGER.warn("Unable to decrypt text", e);
             throw new ServiceException(e);
         }
+    }
+
+    public boolean areFileContentsEncrypted(@Nonnull final File file) throws ServiceException {
+        final String fileContents = SERVICE_FACTORY.getFileService().readTextFromFile(file);
+        return areFileContentsEncrypted(fileContents);
+    }
+
+    private boolean areFileContentsEncrypted(@Nonnull final String text) {
+        return text.startsWith(ENCRYPTION_TAG);
     }
 
     private byte[] encrypt(@Nonnull final String plainText,
@@ -103,5 +129,9 @@ public class AESEncryptionService {
         final byte[] iv = new byte[IV_BYTE_LENGTH];
         new SecureRandom().nextBytes(iv);
         return iv;
+    }
+
+    private String removeEncryptionTagIfPresent(final String cipheredText) {
+        return cipheredText.substring(ENCRYPTION_TAG.length());
     }
 }

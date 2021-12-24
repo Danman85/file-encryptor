@@ -1,6 +1,5 @@
 package nl.danman85.file_encryptor.service;
 
-import nl.danman85.file_encryptor.exception.ResourceException;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,7 +39,7 @@ public class FileServicetest {
     @Test
     void readTextFromFile_returnsTextInTestFile() throws ServiceException, IOException {
         // Given
-        final File testFile = new File(Objects.requireNonNull(getClass().getResource("/testFile.txt")).getPath());
+        final File testFile = new File(Objects.requireNonNull(getClass().getResource("/encryptedTestFile.txt")).getPath());
 
         // When
         final String fileText = this.fileService.readTextFromFile(testFile);

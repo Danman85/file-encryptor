@@ -12,6 +12,8 @@ import nl.danman85.file_encryptor.client.ClientException;
 import nl.danman85.file_encryptor.client.views.Controller;
 import nl.danman85.file_encryptor.client.views.ViewPairFactory;
 import nl.danman85.file_encryptor.client.views.dialogs.AlertUtil;
+import nl.danman85.file_encryptor.client.model.EncryptionFile;
+import nl.danman85.file_encryptor.service.ServiceFactoryImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -28,7 +30,7 @@ public class FileEncryptorController implements Controller {
     @FXML private VBox root;
     @FXML private Button newFileButton;
     @FXML private VBox lineContainer;
-    private final ObservableMap<File, FileLineController> fileLines = FXCollections.synchronizedObservableMap(
+    private final ObservableMap<EncryptionFile, FileLineController> fileLines = FXCollections.synchronizedObservableMap(
             FXCollections.observableHashMap());
 
     public FileEncryptorController() {
@@ -39,7 +41,7 @@ public class FileEncryptorController implements Controller {
     }
 
     private void initListeners() {
-        this.fileLines.addListener((MapChangeListener<File, FileLineController>) change -> {
+        this.fileLines.addListener((MapChangeListener<EncryptionFile, FileLineController>) change -> {
             if (change.wasRemoved()) {
                 lineContainer.getChildren().remove(change.getValueRemoved().getRoot());
             } else {
@@ -75,31 +77,32 @@ public class FileEncryptorController implements Controller {
     }
 
     private void addNewFileLineToListOfFileLines(@Nonnull final File file) {
-            if (isFileNotPresent(file)) {
-                initializeAndAddFileLine(file);
+        final var encryptionFile = new EncryptionFile(file, ServiceFactoryImpl.getInstance());
+        if (isEncryptionFileNotPresent(encryptionFile)) {
+                initializeAndAddFileLine(encryptionFile);
             } else {
                 AlertUtil.createAndShowInformationAlert("File already present");
             }
     }
 
-    private void initializeAndAddFileLine(final File file){
+    private void initializeAndAddFileLine(final EncryptionFile encryptionFile){
         try {
             final var fileLineViewPair = VIEW_PAIR_FACTORY.getFileLineViewPair();
-            fileLineViewPair.getController().setFile(file);
-            fileLineViewPair.getController().getCloseButton().setOnAction(event -> removeFileLine(file, fileLineViewPair.getRoot()));
-            this.fileLines.put(file, fileLineViewPair.getController());
+            fileLineViewPair.getController().init(encryptionFile);
+            fileLineViewPair.getController().getCloseButton().setOnAction(event -> removeFileLine(encryptionFile, fileLineViewPair.getRoot()));
+            this.fileLines.put(encryptionFile, fileLineViewPair.getController());
         } catch (ClientException e) {
-            final String warningMessage = "Unable to add FileLine element for file=" + file.getPath();
+            final String warningMessage = "Unable to add FileLine element for file=" + encryptionFile.getFile().getPath();
             LOGGER.warn(warningMessage, e);
             AlertUtil.createAndShowWarningAlert(warningMessage);
         }
     }
 
-    private boolean isFileNotPresent(final File file) {
-        return !this.fileLines.containsKey(file);
+    private boolean isEncryptionFileNotPresent(final EncryptionFile encryptionFile) {
+        return !this.fileLines.containsKey(encryptionFile);
     }
 
-    private void removeFileLine(final File file, final Parent root) {
-        this.fileLines.remove(file);
+    private void removeFileLine(final EncryptionFile encryptionFile, final Parent root) {
+        this.fileLines.remove(encryptionFile);
     }
 }
