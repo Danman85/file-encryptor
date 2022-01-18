@@ -5,15 +5,15 @@ import javafx.fxml.FXML;
 import javafx.scene.layout.BorderPane;
 import nl.danman85.file_encryptor.client.ClientException;
 import nl.danman85.file_encryptor.client.views.Controller;
-import nl.danman85.file_encryptor.client.views.ViewPairFactory;
+import nl.danman85.file_encryptor.client.views.FXMLViewPairFactory;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class MainViewController implements Controller {
 
-    private static final Logger LOGGER = LogManager.getLogger(ViewPairFactory.class);
+    private static final Logger LOGGER = LogManager.getLogger(FXMLViewPairFactory.class);
 
-    private static final ViewPairFactory viewPairFactory = ViewPairFactory.getInstance();
+    private static final FXMLViewPairFactory viewPairFactory = FXMLViewPairFactory.getInstance();
 
     @FXML private BorderPane root;
 

@@ -1,18 +1,16 @@
 package nl.danman85.file_encryptor.service;
 
-import nl.danman85.file_encryptor.service.encryption.AESEncryptionService;
-
 import javax.annotation.Nonnull;
 
 public class ServiceFactoryImpl implements ServiceFactory {
 
     private static ServiceFactory INSTANCE = null;
 
-    private final FileService fileService;
+    private final FileServiceImpl fileService;
     private final AESEncryptionService aesEncryptionService;
 
     private ServiceFactoryImpl() {
-        this.fileService = new FileService();
+        this.fileService = new FileServiceImpl();
         this.aesEncryptionService = new AESEncryptionService();
     }
 
@@ -26,7 +24,7 @@ public class ServiceFactoryImpl implements ServiceFactory {
 
     @Nonnull
     @Override
-    public FileService getFileService() {
+    public FileServiceImpl getFileService() {
         return this.fileService;
     }
 

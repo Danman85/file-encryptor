@@ -10,7 +10,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.FileChooser;
 import nl.danman85.file_encryptor.client.ClientException;
 import nl.danman85.file_encryptor.client.views.Controller;
-import nl.danman85.file_encryptor.client.views.ViewPairFactory;
+import nl.danman85.file_encryptor.client.views.FXMLViewPairFactory;
 import nl.danman85.file_encryptor.client.views.dialogs.AlertUtil;
 import nl.danman85.file_encryptor.client.model.EncryptionFile;
 import nl.danman85.file_encryptor.service.ServiceFactoryImpl;
@@ -25,7 +25,7 @@ public class FileEncryptorController implements Controller {
 
     private static final Logger LOGGER = LogManager.getLogger(FileEncryptorController.class);
 
-    private static final ViewPairFactory VIEW_PAIR_FACTORY = ViewPairFactory.getInstance();
+    private static final FXMLViewPairFactory VIEW_PAIR_FACTORY = FXMLViewPairFactory.getInstance();
 
     @FXML private VBox root;
     @FXML private Button newFileButton;

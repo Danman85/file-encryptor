@@ -1,8 +1,5 @@
-package nl.danman85.file_encryptor.service.encryption;
+package nl.danman85.file_encryptor.service;
 
-import nl.danman85.file_encryptor.service.ServiceException;
-import nl.danman85.file_encryptor.service.ServiceFactory;
-import nl.danman85.file_encryptor.service.ServiceFactoryImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -55,8 +52,10 @@ public class AESEncryptionService {
         if (areFileContentsEncrypted(plainText)) {
             throw new ServiceException("Unable to encrypt an already encrypted text");
         }
+
         final byte[] iv = generateIv();
         final byte[] cipheredText;
+
         try {
             cipheredText = encrypt(plainText.trim(), key, iv);
             final byte[] cipheredTexWithIv = ByteBuffer.allocate(iv.length + cipheredText.length)
@@ -74,14 +73,9 @@ public class AESEncryptionService {
     @Nonnull
     public String decryptWithPrefixIv(@Nonnull final String cipheredText,
                                       @Nonnull final SecretKey key) throws ServiceException {
-        final String deTaggedCipheredText;
-        if (areFileContentsEncrypted(cipheredText)) {
-            deTaggedCipheredText = removeEncryptionTagIfPresent(cipheredText.trim());
-        } else {
-            throw new ServiceException("Unable to decrypt an unencrypted text");
-        }
+        final String unTaggedCipheredText = removeEncryptionTagIfPresent(cipheredText);
 
-        final ByteBuffer bb = ByteBuffer.wrap(Base64.getDecoder().decode(deTaggedCipheredText));
+        final ByteBuffer bb = ByteBuffer.wrap(Base64.getDecoder().decode(unTaggedCipheredText));
         final byte[] iv = new byte[IV_BYTE_LENGTH];
         bb.get(iv);
         final byte[] cipheredTextBytes = new byte[bb.remaining()];
@@ -99,7 +93,7 @@ public class AESEncryptionService {
     }
 
     public boolean areFileContentsEncrypted(@Nonnull final File file) throws ServiceException {
-        final String fileContents = SERVICE_FACTORY.getFileService().readTextFromFile(file);
+        final String fileContents = SERVICE_FACTORY.getFileService().read(file);
         return areFileContentsEncrypted(fileContents);
     }
 
@@ -111,6 +105,7 @@ public class AESEncryptionService {
                           @Nonnull final SecretKey key,
                           final byte[] iv) throws NoSuchPaddingException, NoSuchAlgorithmException,
             InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+
         final Cipher cipher = Cipher.getInstance(ALGORITHM);
         cipher.init(Cipher.ENCRYPT_MODE, key, new GCMParameterSpec(TAG_LENGTH, iv));
         return cipher.doFinal(plainText.getBytes());
@@ -120,6 +115,7 @@ public class AESEncryptionService {
                           @Nonnull final SecretKey key,
                           @Nonnull final IvParameterSpec iv) throws NoSuchPaddingException, NoSuchAlgorithmException,
             InvalidAlgorithmParameterException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
+
         final Cipher cipher = Cipher.getInstance(ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, key, new GCMParameterSpec(TAG_LENGTH, iv.getIV()));
         return cipher.doFinal(cipheredText);
@@ -131,7 +127,11 @@ public class AESEncryptionService {
         return iv;
     }
 
-    private String removeEncryptionTagIfPresent(final String cipheredText) {
-        return cipheredText.substring(ENCRYPTION_TAG.length());
+    private String removeEncryptionTagIfPresent(final String cipheredText) throws ServiceException {
+        if (areFileContentsEncrypted(cipheredText)) {
+            return cipheredText.substring(ENCRYPTION_TAG.length());
+        } else {
+            throw new ServiceException("Unable to decrypt an unencrypted text");
+        }
     }
 }

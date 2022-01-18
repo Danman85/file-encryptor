@@ -4,8 +4,8 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import nl.danman85.file_encryptor.App;
-import nl.danman85.file_encryptor.client.views.ViewPair;
-import nl.danman85.file_encryptor.client.views.ViewPairFactory;
+import nl.danman85.file_encryptor.client.views.FXMLViewPair;
+import nl.danman85.file_encryptor.client.views.FXMLViewPairFactory;
 import nl.danman85.file_encryptor.client.views.main.MainViewController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +17,7 @@ public class Client {
 
     public static final Logger LOGGER = LoggerFactory.getLogger(App.class);
 
-    private static final ViewPairFactory fxmlViewFactory = ViewPairFactory.getInstance();
+    private static final FXMLViewPairFactory fxmlViewFactory = FXMLViewPairFactory.getInstance();
 
     public Client() {
     }
@@ -29,7 +29,7 @@ public class Client {
         final Parent root = createMainView();
 
         // Create scene
-        final Scene scene =  new Scene(root, 400, 400);
+        final Scene scene =  new Scene(root, 600, 400);
 
         // Set CSS on Scene
 
@@ -39,7 +39,7 @@ public class Client {
     }
 
     private Parent createMainView() throws ClientException {
-        final ViewPair<MainViewController> viewPair = fxmlViewFactory.getMainViewPair();
+        final FXMLViewPair<MainViewController> viewPair = fxmlViewFactory.getMainViewPair();
         return viewPair.getRoot();
     }
 }
