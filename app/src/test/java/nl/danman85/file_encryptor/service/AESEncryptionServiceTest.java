@@ -1,6 +1,5 @@
 package nl.danman85.file_encryptor.service;
 
-import nl.danman85.file_encryptor.service.encryption.AESEncryptionService;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,11 +29,17 @@ public class AESEncryptionServiceTest {
 
     @Test
     void getKeyFromPassword_generatesKeyWithCorrectEncodedValue() {
-                final byte[] expectedEncodedValue = new byte[] {
-                -122, 95, 41, -120, 69, -110, 99, -103, 93, 98, 76,
-                -120, -30, 89, 11, 7, 73, -99, -50, 25, -104, -36,
-                94, -88, 14, -76, -65, 16, -11, -94, 88, 117};
-        assertArrayEquals(expectedEncodedValue, this.defaultKey.getEncoded());
+        // Given
+        final byte[] expectedEncodedValue = new byte[] {
+        -122, 95, 41, -120, 69, -110, 99, -103, 93, 98, 76,
+        -120, -30, 89, 11, 7, 73, -99, -50, 25, -104, -36,
+        94, -88, 14, -76, -65, 16, -11, -94, 88, 117};
+
+        // When
+        final byte[] actualEncodedValue = this.defaultKey.getEncoded();
+
+        // Then
+        assertArrayEquals(expectedEncodedValue, actualEncodedValue);
     }
 
     @Test

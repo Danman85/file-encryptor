@@ -12,11 +12,11 @@ import java.util.Objects;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class FileServicetest {
+public class FileServiceImpltest {
 
     private static final ServiceFactory SERVICE_FACTORY = ServiceFactoryImpl.getInstance();
 
-    private FileService fileService;
+    private FileServiceImpl fileService;
 
     @BeforeEach
     void setupTest() {
@@ -29,7 +29,7 @@ public class FileServicetest {
         final File nonExistentFile = new File("C:\\thisFileDoesNotExist.txt");
 
         // When
-        final ServiceException thrown = assertThrows(ServiceException.class, () -> this.fileService.readTextFromFile(nonExistentFile));
+        final ServiceException thrown = assertThrows(ServiceException.class, () -> this.fileService.read(nonExistentFile));
 
         // Then
         assertNotNull(thrown);
@@ -42,7 +42,7 @@ public class FileServicetest {
         final File testFile = new File(Objects.requireNonNull(getClass().getResource("/encryptedTestFile.txt")).getPath());
 
         // When
-        final String fileText = this.fileService.readTextFromFile(testFile);
+        final String fileText = this.fileService.read(testFile);
 
         // Then
         assertNotNull(fileText);
@@ -55,7 +55,7 @@ public class FileServicetest {
         final File nonExistentFile = new File("C:\\thisFileDoesNotExist.txt");
 
         // When
-        final ServiceException thrown = assertThrows(ServiceException.class, () -> this.fileService.writeTextToFile("", nonExistentFile));
+        final ServiceException thrown = assertThrows(ServiceException.class, () -> this.fileService.write("", nonExistentFile));
 
         // Then
         assertNotNull(thrown);
@@ -69,7 +69,7 @@ public class FileServicetest {
         final String textToStore = "This is saved text!\nHah!\n\nAaaaand, it is over";
 
         // When
-        this.fileService.writeTextToFile(textToStore, emptyTestFile);
+        this.fileService.write(textToStore, emptyTestFile);
 
         // Then
         assertEquals(FileUtils.readFileToString(emptyTestFile, StandardCharsets.UTF_8), textToStore);

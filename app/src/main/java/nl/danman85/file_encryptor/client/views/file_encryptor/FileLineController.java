@@ -7,6 +7,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import nl.danman85.file_encryptor.client.ClientException;
 import nl.danman85.file_encryptor.client.model.EncryptionFile;
+import nl.danman85.file_encryptor.client.skeleton.events.DoubleClickEventHandler;
 import nl.danman85.file_encryptor.client.views.Controller;
 import nl.danman85.file_encryptor.client.views.dialogs.AlertUtil;
 import nl.danman85.file_encryptor.client.views.dialogs.PasswordDialog;
@@ -18,6 +19,7 @@ import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
 import javax.crypto.SecretKey;
+import java.io.IOException;
 import java.util.Optional;
 
 public class FileLineController implements Controller {
@@ -32,6 +34,7 @@ public class FileLineController implements Controller {
     @FXML private Button closeButton;
     @FXML private Button encryptButton;
     @FXML private Button decryptButton;
+    @FXML private Button openButton;
 
     private EncryptionFile encryptionFile;
 
@@ -46,6 +49,7 @@ public class FileLineController implements Controller {
         setEncryptionFile(encryptionFile);
         this.encryptButton.disableProperty().bind(this.encryptionFile.getIsEncryptedProperty());
         this.decryptButton.disableProperty().bind(this.encryptionFile.getIsEncryptedProperty().not());
+        this.root.setOnMouseClicked(mouseEvent -> new DoubleClickEventHandler(mEvent -> openFileInEditor()).handle(mouseEvent));
     }
 
     @Override
@@ -53,7 +57,8 @@ public class FileLineController implements Controller {
         return this.root;
     }
 
-    public void encryptFileContents() {
+    @FXML
+    private void encryptFileContents() {
         final String password = showPassWordDialogAndGetPassword();
 
         if (!password.isBlank()) {
@@ -61,11 +66,23 @@ public class FileLineController implements Controller {
         }
     }
 
-    public void decryptFileContents() {
+    @FXML
+    private void decryptFileContents() {
         final String password = showPassWordDialogAndGetPassword();
 
         if (!password.isBlank()) {
             decryptFileContents(password);
+        }
+    }
+
+    @FXML
+    private void openFileInEditor() {
+        final ProcessBuilder openEditorProcess = new ProcessBuilder("C:\\Program Files\\Notepad++\\notepad++.exe", this.encryptionFile.getFile().getPath());
+        try {
+            LOGGER.debug("Opening Notepad++ for file=" + this.encryptionFile.getFile().getPath());
+            openEditorProcess.start();
+        } catch (IOException e) {
+            LOGGER.warn(e);
         }
     }
 
@@ -102,6 +119,7 @@ public class FileLineController implements Controller {
             final String warningMessage = "Unable to encrypt contents";
             LOGGER.warn(warningMessage, e);
             AlertUtil.createAndShowWarningAlert(warningMessage);
+
         }
     }
 

@@ -42,35 +42,37 @@ public class EncryptionFile {
 
     public String read() throws ServiceException {
         determineEncryptionStateForContents();
-        return this.serviceFactory.getFileService().readTextFromFile(this.file);
+        return this.serviceFactory.getFileService().read(this.file);
     }
 
     public void write(@Nonnull final String text) throws ServiceException, ClientException {
         if (isEncrypted()) {
             throw new ClientException("Cannot write to an encrypted file, decrypt it first");
         }
-        this.serviceFactory.getFileService().writeTextToFile(text, this.file);
+        this.serviceFactory.getFileService().write(text, this.file);
         determineEncryptionStateForContents();
     }
 
     public void encrypt(@Nonnull final SecretKey secretKey) throws ClientException {
         try {
-            final String text = this.serviceFactory.getFileService().readTextFromFile(this.file);
+            final String text = this.serviceFactory.getFileService().read(this.file);
             final String encryptedText = this.serviceFactory.getAesEncryptionService().encryptWithPrefixIv(text, secretKey);
-            this.serviceFactory.getFileService().writeTextToFile(encryptedText, this.file);
+            this.serviceFactory.getFileService().write(encryptedText, this.file);
             this.isEncryptedProperty.setValue(true);
         } catch (ServiceException e) {
+            determineEncryptionStateForContents();
             throw new ClientException(e);
         }
     }
 
     public void decrypt(@Nonnull final SecretKey secretKey) throws ClientException {
         try {
-            final String encryptedText = this.serviceFactory.getFileService().readTextFromFile(this.file);
+            final String encryptedText = this.serviceFactory.getFileService().read(this.file);
             final String plainText = this.serviceFactory.getAesEncryptionService().decryptWithPrefixIv(encryptedText, secretKey);
-            this.serviceFactory.getFileService().writeTextToFile(plainText, this.file);
+            this.serviceFactory.getFileService().write(plainText, this.file);
             this.isEncryptedProperty.setValue(false);
         } catch (ServiceException e) {
+            determineEncryptionStateForContents();
             throw new ClientException(e);
         }
     }
