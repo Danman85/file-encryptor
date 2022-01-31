@@ -2,6 +2,8 @@ package nl.danman.file_encryptor.client.configuration;
 
 public class ConfigException extends Exception {
 
+    public ConfigException() {}
+
     public ConfigException(final String message) {
         super(message);
     }

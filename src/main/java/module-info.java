@@ -6,9 +6,9 @@ module nl.danman.file_encryptor {
 
     requires javafx.controls;
     requires javafx.fxml;
-    requires javafx.graphics;
 
     opens nl.danman.file_encryptor.client.views.main to javafx.fxml;
     opens nl.danman.file_encryptor.client.views.file_encryptor to javafx.fxml;
+
     exports nl.danman.file_encryptor;
 }
