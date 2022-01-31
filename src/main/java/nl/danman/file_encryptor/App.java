@@ -4,11 +4,8 @@
 package nl.danman.file_encryptor;
 
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.stage.Stage;
 import nl.danman.file_encryptor.client.Client;
-import nl.danman.file_encryptor.client.configuration.ConfigException;
-import nl.danman.file_encryptor.client.configuration.ConfigValidator;
 import nl.danman.file_encryptor.exception.ExceptionLoggingHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,20 +21,7 @@ public class App extends Application {
 
     @Override
     public void start(final Stage stage) {
-
-        validateConfig();
         startClient(stage);
-    }
-
-    private void validateConfig() {
-        final var validator = new ConfigValidator();
-        try {
-            validator.validate();
-            LOGGER.debug("Config validation succeeded");
-        } catch (ConfigException e) {
-            LOGGER.error("Configuration validation failed, exiting application");
-            Platform.exit();
-        }
     }
 
     private void startClient(final Stage stage) {

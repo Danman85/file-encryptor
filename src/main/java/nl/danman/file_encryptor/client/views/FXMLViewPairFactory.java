@@ -5,7 +5,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.util.Pair;
 import nl.danman.file_encryptor.client.ClientException;
-import nl.danman.file_encryptor.client.configuration.FXMLViewSource;
 import nl.danman.file_encryptor.client.views.file_encryptor.FileEncryptorController;
 import nl.danman.file_encryptor.client.views.file_encryptor.FileLineController;
 import nl.danman.file_encryptor.client.views.main.MainViewController;
@@ -33,7 +32,7 @@ public class FXMLViewPairFactory {
 
     @NonNull
     public FXMLViewPair<MainViewController> getMainViewPair() throws ClientException {
-        final var mainViewPair = getViewPairForViewResource(FXMLViewSource.MAIN_VIEW);
+        final var mainViewPair = getViewPairForViewResource(FXMLViewDefinition.MAIN_VIEW);
         if (mainViewPair.getController() instanceof MainViewController) {
             return new FXMLViewPair<>(mainViewPair.getRoot(), (MainViewController) mainViewPair.getController());
         } else {
@@ -44,7 +43,7 @@ public class FXMLViewPairFactory {
 
     @NonNull
     public FXMLViewPair<FileEncryptorController> getFileEncryptorViewPair() throws ClientException {
-        final var mainViewPair = getViewPairForViewResource(FXMLViewSource.FILE_ENCRYPTOR);
+        final var mainViewPair = getViewPairForViewResource(FXMLViewDefinition.FILE_ENCRYPTOR);
         if (mainViewPair.getController() instanceof FileEncryptorController) {
             return new FXMLViewPair<>(mainViewPair.getRoot(), (FileEncryptorController) mainViewPair.getController());
         } else {
@@ -55,7 +54,7 @@ public class FXMLViewPairFactory {
 
     @NonNull
     public FXMLViewPair<FileLineController> getFileLineViewPair() throws ClientException {
-        final var mainViewPair = getViewPairForViewResource(FXMLViewSource.FILE_LINE);
+        final var mainViewPair = getViewPairForViewResource(FXMLViewDefinition.FILE_LINE);
         if (mainViewPair.getController() instanceof FileLineController) {
             return new FXMLViewPair<>(mainViewPair.getRoot(), (FileLineController) mainViewPair.getController());
         } else {
@@ -76,7 +75,7 @@ public class FXMLViewPairFactory {
      * @throws ClientException exception
      */
     @NonNull
-    private <C extends Controller> FXMLViewPair<C> getViewPairForViewResource(@NonNull final FXMLViewSource fxmlViewSource) throws ClientException {
+    private <C extends Controller> FXMLViewPair<C> getViewPairForViewResource(@NonNull final FXMLViewDefinition fxmlViewSource) throws ClientException {
         final var loader = new FXMLLoader(Objects.requireNonNull(getClass().getResource(fxmlViewSource.getResourceUrl())));
         C controller;
         Parent root;
