@@ -42,8 +42,12 @@ javafx {
 }
 
 jlink {
+    imageName = "${project.name}-${version}"
     options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
     forceMerge 'log4j-api'
+    launcher {
+        name = "${project.name}-${version}"
+    }
 }
 
 tasks.named('test') {
