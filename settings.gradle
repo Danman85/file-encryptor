@@ -8,3 +8,6 @@
  */
 
 rootProject.name = 'file-encryptor'
+include 'app'
+include 'model'
+

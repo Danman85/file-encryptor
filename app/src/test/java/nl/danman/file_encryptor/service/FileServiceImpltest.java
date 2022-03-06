@@ -1,6 +1,7 @@
 package nl.danman.file_encryptor.service;
 
 import org.apache.commons.io.FileUtils;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -46,7 +47,7 @@ public class FileServiceImpltest {
 
         // Then
         assertNotNull(fileText);
-        assertEquals(FileUtils.readFileToString(testFile, StandardCharsets.UTF_8), fileText);
+        Assertions.assertEquals(FileUtils.readFileToString(testFile, StandardCharsets.UTF_8), fileText);
     }
 
     @Test
@@ -72,7 +73,7 @@ public class FileServiceImpltest {
         this.fileService.write(textToStore, emptyTestFile);
 
         // Then
-        assertEquals(FileUtils.readFileToString(emptyTestFile, StandardCharsets.UTF_8), textToStore);
+        Assertions.assertEquals(FileUtils.readFileToString(emptyTestFile, StandardCharsets.UTF_8), textToStore);
     }
 
     private File createNewFile() throws IOException {
