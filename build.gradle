@@ -1,55 +1,19 @@
-plugins {
-    id 'application'
-    id 'org.openjfx.javafxplugin' version '0.0.11'
-    id "org.beryx.jlink" version "2.24.4"
-}
+subprojects {
 
-group = 'nl.danman'
-version = '0.0.1'
+    apply plugin: 'java'
 
-sourceCompatibility = 11
-targetCompatibility = 11
-
-repositories {
-    mavenCentral()
-}
-
-dependencies {
-
-    implementation 'com.github.spotbugs:spotbugs:4.5.3'
-    // https://mvnrepository.com/artifact/commons-io/commons-io
-    implementation 'commons-io:commons-io:2.11.0'
-
-    implementation 'org.apache.logging.log4j:log4j-core:2.17.1'
-
-    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
-    testImplementation 'org.mockito:mockito-junit-jupiter:4.2.0'
-    testImplementation 'org.hamcrest:hamcrest:2.2'
-}
-
-application {
-    mainClass = 'nl.danman.file_encryptor.App'
-    mainModule = 'nl.danman.file_encryptor'
-}
-
-javafx {
-    version = '11.0.2'
-    modules = [
-            'javafx.controls',
-            'javafx.fxml',
-    ]
-}
-
-jlink {
-    imageName = "${project.name}-${version}"
-    options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
-    forceMerge 'log4j-api'
-    launcher {
-        name = "${project.name}-${version}"
+    repositories {
+        mavenCentral()
     }
-}
 
-tasks.named('test') {
-    useJUnitPlatform()
+    dependencies {
+
+        implementation 'com.github.spotbugs:spotbugs:4.5.3'
+        implementation 'org.apache.logging.log4j:log4j-core:2.17.1'
+
+        testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.2'
+        testImplementation 'org.mockito:mockito-junit-jupiter:4.3.1'
+        testImplementation 'org.hamcrest:hamcrest:2.2'
+    }
 }
