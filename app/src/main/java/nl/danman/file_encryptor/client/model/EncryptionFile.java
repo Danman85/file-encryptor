@@ -4,8 +4,10 @@ import edu.umd.cs.findbugs.annotations.NonNull;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import nl.danman.file_encryptor.client.ClientException;
+import nl.danman.file_encryptor.model.FileWithContent;
 import nl.danman.file_encryptor.service.ServiceException;
 import nl.danman.file_encryptor.service.ServiceFactory;
+import nl.danman.file_encryptor.service.impl.ServiceFactoryImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -17,47 +19,33 @@ public class EncryptionFile {
 
     private static final Logger LOGGER = LogManager.getLogger(EncryptionFile.class);
 
-    private final ServiceFactory serviceFactory;
+    private static final ServiceFactory SERVICE_FACTORY = ServiceFactoryImpl.getInstance();
 
     private final BooleanProperty isEncryptedProperty = new SimpleBooleanProperty(false);
 
-    private final File file;
+    private FileWithContent fileWithContent;
 
-    public EncryptionFile(final File file, ServiceFactory serviceFactory) {
-        this.serviceFactory = serviceFactory;
-        this.file = file;
+    public EncryptionFile(final FileWithContent fileWithContent) {
+        this.fileWithContent = fileWithContent;
         determineEncryptionStateForContents();
-        LOGGER.debug("Initialized EncryptedFile object, path=" + this.file.getPath() +
+        LOGGER.debug("Initialized EncryptedFile object, path=" + this.fileWithContent.getUri() +
                 ", isEncrypted=" + this.isEncrypted());
     }
 
     public void determineEncryptionStateForContents() {
         try {
-            this.isEncryptedProperty.setValue(this.serviceFactory
-                    .getAesEncryptionService().areFileContentsEncrypted(file));
+            this.isEncryptedProperty.setValue(SERVICE_FACTORY
+                    .getAesEncryptionService().areFileContentsEncrypted(fileWithContent));
         } catch (ServiceException e) {
-            LOGGER.warn("Unable to determine encryption state for file=" + file.getName(), e);
+            LOGGER.warn("Unable to determine encryption state for file=" + fileWithContent.getUri(), e);
         }
-    }
-
-    public String read() throws ServiceException {
-        determineEncryptionStateForContents();
-        return this.serviceFactory.getFileService().read(this.file);
-    }
-
-    public void write(@NonNull final String text) throws ServiceException, ClientException {
-        if (isEncrypted()) {
-            throw new ClientException("Cannot write to an encrypted file, decrypt it first");
-        }
-        this.serviceFactory.getFileService().write(text, this.file);
-        determineEncryptionStateForContents();
     }
 
     public void encrypt(@NonNull final SecretKey secretKey) throws ClientException {
         try {
-            final String text = this.serviceFactory.getFileService().read(this.file);
-            final String encryptedText = this.serviceFactory.getAesEncryptionService().encryptWithPrefixIv(text, secretKey);
-            this.serviceFactory.getFileService().write(encryptedText, this.file);
+            final String text = fileWithContent.content;
+            final String encryptedText = SERVICE_FACTORY.getAesEncryptionService().encryptWithPrefixIv(text, secretKey);
+            this.fileWithContent = SERVICE_FACTORY.getFileWithContentService().update(fileWithContent.withNewContent(encryptedText));
             this.isEncryptedProperty.setValue(true);
         } catch (ServiceException e) {
             determineEncryptionStateForContents();
@@ -67,9 +55,9 @@ public class EncryptionFile {
 
     public void decrypt(@NonNull final SecretKey secretKey) throws ClientException {
         try {
-            final String encryptedText = this.serviceFactory.getFileService().read(this.file);
-            final String plainText = this.serviceFactory.getAesEncryptionService().decryptWithPrefixIv(encryptedText, secretKey);
-            this.serviceFactory.getFileService().write(plainText, this.file);
+            final String encryptedText = fileWithContent.content;
+            final String plainText = SERVICE_FACTORY.getAesEncryptionService().decryptWithPrefixIv(encryptedText, secretKey);
+            this.fileWithContent = SERVICE_FACTORY.getFileWithContentService().update(fileWithContent.withNewContent(plainText));
             this.isEncryptedProperty.setValue(false);
         } catch (ServiceException e) {
             determineEncryptionStateForContents();
@@ -78,7 +66,7 @@ public class EncryptionFile {
     }
 
     public File getFile() {
-        return new File(this.file.getPath());
+        return new File(fileWithContent.file.getAbsolutePath());
     }
 
     public BooleanProperty getIsEncryptedProperty() {
@@ -94,11 +82,11 @@ public class EncryptionFile {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         final EncryptionFile that = (EncryptionFile) o;
-        return file.equals(that.file);
+        return fileWithContent.equals(that.fileWithContent);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(file);
+        return Objects.hash(fileWithContent);
     }
 }

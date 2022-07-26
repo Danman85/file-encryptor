@@ -1,15 +1,22 @@
-package nl.danman.file_encryptor.service;
+package nl.danman.file_encryptor.service.impl;
 
+import nl.danman.file_encryptor.service.ServiceFactory;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@ExtendWith(MockitoExtension.class)
 public class ServiceFactoryImplTest {
 
     private final ServiceFactory serviceFactory = ServiceFactoryImpl.getInstance();
+
+    @Test
+    void getInstance_returnsNonnullObject() {
+        // When
+        final ServiceFactory serviceFactory = ServiceFactoryImpl.getInstance();
+
+        // Then
+        assertNotNull(serviceFactory);
+    }
 
     @Test
     void getInstance_repeatedlyReturnsTheSameObject() {
@@ -23,9 +30,18 @@ public class ServiceFactoryImplTest {
     }
 
     @Test
+    void createAESEncryptionService_returnsAESEncryptionServiceObject() {
+        // When
+        final AESEncryptionService aesEncryptionService = this.serviceFactory.getAesEncryptionService();
+
+        // Then
+        assertNotNull(aesEncryptionService);
+    }
+
+    @Test
     void createFileService_returnsFileServiceObject() {
         // When
-        final FileServiceImpl fileService = this.serviceFactory.getFileService();
+        final FileWithContentService fileService = this.serviceFactory.getFileWithContentService();
 
         // Then
         assertNotNull(fileService);
