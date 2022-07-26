@@ -14,7 +14,9 @@ import nl.danman.file_encryptor.client.model.EncryptionFile;
 import nl.danman.file_encryptor.client.views.Controller;
 import nl.danman.file_encryptor.client.views.FXMLViewPairFactory;
 import nl.danman.file_encryptor.client.views.dialogs.AlertUtil;
-import nl.danman.file_encryptor.service.ServiceFactoryImpl;
+import nl.danman.file_encryptor.model.FileWithContent;
+import nl.danman.file_encryptor.service.ServiceFactory;
+import nl.danman.file_encryptor.service.impl.ServiceFactoryImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -26,6 +28,8 @@ public class FileEncryptorController implements Controller {
     private static final Logger LOGGER = LogManager.getLogger(FileEncryptorController.class);
 
     private static final FXMLViewPairFactory VIEW_PAIR_FACTORY = FXMLViewPairFactory.getInstance();
+
+    private static final ServiceFactory SERVICE_FACTORY = ServiceFactoryImpl.getInstance();
 
     @FXML private VBox root;
     @FXML private Button newFileButton;
@@ -78,12 +82,19 @@ public class FileEncryptorController implements Controller {
     }
 
     private void addNewFileLineToListOfFileLines(@NonNull final File file) {
-        final var encryptionFile = new EncryptionFile(file, ServiceFactoryImpl.getInstance());
-        if (isEncryptionFileNotPresent(encryptionFile)) {
+        final Optional<FileWithContent> fileWithContent = SERVICE_FACTORY.getFileWithContentService()
+                .read(file.getAbsolutePath());
+        if (fileWithContent.isEmpty()) {
+            AlertUtil.createAndShowInformationAlert("File=" + file.getAbsolutePath() +" not present");
+        } else {
+            final EncryptionFile encryptionFile = new EncryptionFile(fileWithContent.get());
+            if (isEncryptionFileNotPresentInLoadedFiles(encryptionFile)) {
                 initializeAndAddFileLine(encryptionFile);
             } else {
                 AlertUtil.createAndShowInformationAlert("File already present");
             }
+        }
+        final EncryptionFile encryptionFile;
     }
 
     private void initializeAndAddFileLine(@NonNull final EncryptionFile encryptionFile){
@@ -99,7 +110,7 @@ public class FileEncryptorController implements Controller {
         }
     }
 
-    private boolean isEncryptionFileNotPresent(@NonNull final EncryptionFile encryptionFile) {
+    private boolean isEncryptionFileNotPresentInLoadedFiles(@NonNull final EncryptionFile encryptionFile) {
         return !this.fileLines.containsKey(encryptionFile);
     }
 

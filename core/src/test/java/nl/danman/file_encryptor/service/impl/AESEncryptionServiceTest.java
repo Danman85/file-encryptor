@@ -1,5 +1,7 @@
-package nl.danman.file_encryptor.service;
+package nl.danman.file_encryptor.service.impl;
 
+import nl.danman.file_encryptor.service.ServiceException;
+import nl.danman.file_encryptor.service.impl.AESEncryptionService;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

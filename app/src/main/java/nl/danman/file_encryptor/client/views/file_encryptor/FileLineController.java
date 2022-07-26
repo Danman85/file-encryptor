@@ -14,7 +14,7 @@ import nl.danman.file_encryptor.client.views.dialogs.AlertUtil;
 import nl.danman.file_encryptor.client.views.dialogs.PasswordDialog;
 import nl.danman.file_encryptor.service.ServiceException;
 import nl.danman.file_encryptor.service.ServiceFactory;
-import nl.danman.file_encryptor.service.ServiceFactoryImpl;
+import nl.danman.file_encryptor.service.impl.ServiceFactoryImpl;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 

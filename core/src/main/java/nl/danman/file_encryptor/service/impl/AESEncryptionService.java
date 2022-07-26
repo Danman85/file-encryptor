@@ -1,6 +1,10 @@
-package nl.danman.file_encryptor.service;
+package nl.danman.file_encryptor.service.impl;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
+import nl.danman.file_encryptor.model.FileWithContent;
+import nl.danman.file_encryptor.repository.RepositoryFactory;
+import nl.danman.file_encryptor.repository.impl.RepositoryFactoryImpl;
+import nl.danman.file_encryptor.service.ServiceException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -9,7 +13,6 @@ import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
-import java.io.File;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
@@ -24,7 +27,7 @@ public class AESEncryptionService {
 
     private static final Logger LOGGER = LogManager.getLogger(AESEncryptionService.class);
 
-    private static final ServiceFactory SERVICE_FACTORY = ServiceFactoryImpl.getInstance();
+    private static final RepositoryFactory REPOSITORY_FACTORY = RepositoryFactoryImpl.getInstance();
 
     private static final String ALGORITHM = "AES/GCM/NoPadding";
     private static final int TAG_LENGTH = 128;
@@ -92,9 +95,11 @@ public class AESEncryptionService {
         }
     }
 
-    public boolean areFileContentsEncrypted(@NonNull final File file) throws ServiceException {
-        final String fileContents = SERVICE_FACTORY.getFileService().read(file);
-        return areFileContentsEncrypted(fileContents);
+    public boolean areFileContentsEncrypted(@NonNull final FileWithContent fileWithContent) throws ServiceException {
+        // TODO  this needs to be implemented again
+//        final String fileContents = REPOSITORY_FACTORY.getFileRepository().read(file);
+//        return areFileContentsEncrypted(fileContents);
+        return false;
     }
 
     private boolean areFileContentsEncrypted(@NonNull final String text) {
