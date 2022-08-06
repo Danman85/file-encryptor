@@ -119,7 +119,7 @@ public class FileLineController implements Controller {
             final SecretKey key = SERVICE_FACTORY.getAesEncryptionService().getKeyFromPassword(password, SALT);
             this.encryptionFile.encrypt(key);
         } catch (ClientException | ServiceException e) {
-            final String warningMessage = "Unable to encrypt contents";
+            final String warningMessage = "Unable to encrypt contents: " + e.getMessage();
             LOGGER.warn(warningMessage, e);
             AlertUtil.createAndShowWarningAlert(warningMessage);
 

@@ -1,7 +1,7 @@
 plugins {
-    id 'application'
-    id 'org.openjfx.javafxplugin' version '0.0.13'
-    id "org.beryx.jlink" version "2.24.4"
+    id 'application' // https://docs.gradle.org/current/userguide/application_plugin.html
+    id 'org.openjfx.javafxplugin' version '0.0.13' // https://github.com/openjfx/javafx-gradle-plugin
+    id "org.beryx.jlink" version "2.25.0" // https://github.com/beryx/badass-jlink-plugin/
 }
 
 group = 'nl.danman'

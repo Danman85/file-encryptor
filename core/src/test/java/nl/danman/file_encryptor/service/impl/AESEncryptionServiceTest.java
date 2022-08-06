@@ -1,7 +1,7 @@
 package nl.danman.file_encryptor.service.impl;
 
+import nl.danman.file_encryptor.model.FileWithContent;
 import nl.danman.file_encryptor.service.ServiceException;
-import nl.danman.file_encryptor.service.impl.AESEncryptionService;
 import org.apache.commons.io.FileUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -97,6 +97,32 @@ public class AESEncryptionServiceTest {
         assertNotNull(thrown);
         assertEquals("Unable to decrypt an unencrypted text", thrown.getMessage());
 
+    }
+
+    @Test
+    void areFileContentsEncrypted_returnsTrue_whenEncrypted() throws ServiceException {
+        // Given
+        final FileWithContent fileWithEncryptedContent = new FileWithContent(
+                "", ENCRYPTION_TAG + "Hello World");
+
+        // When
+        final boolean shouldBeEncrypted = encryptionService.areFileContentsEncrypted(fileWithEncryptedContent);
+
+        // Then
+        assertTrue(shouldBeEncrypted);
+    }
+
+    @Test
+    void areFileContentsEncrypted_returnsFalse_whenNotEncrypted() throws ServiceException {
+        // Given
+        final FileWithContent fileWithEncryptedContent = new FileWithContent(
+                "", "Hello World");
+
+        // When
+        final boolean shouldBeEncrypted = encryptionService.areFileContentsEncrypted(fileWithEncryptedContent);
+
+        // Then
+        assertFalse(shouldBeEncrypted);
     }
 
     private String getTextFromEnryptedFile() throws IOException {
