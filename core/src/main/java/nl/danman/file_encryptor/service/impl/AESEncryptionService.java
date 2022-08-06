@@ -96,10 +96,7 @@ public class AESEncryptionService {
     }
 
     public boolean areFileContentsEncrypted(@NonNull final FileWithContent fileWithContent) throws ServiceException {
-        // TODO  this needs to be implemented again
-//        final String fileContents = REPOSITORY_FACTORY.getFileRepository().read(file);
-//        return areFileContentsEncrypted(fileContents);
-        return false;
+        return areFileContentsEncrypted(fileWithContent.content);
     }
 
     private boolean areFileContentsEncrypted(@NonNull final String text) {

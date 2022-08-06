@@ -44,9 +44,11 @@ public class FileWithContentService {
     public FileWithContent update(final FileWithContent fileWithContentToUpdate) throws ServiceException {
         Objects.requireNonNull(fileWithContentToUpdate, "cannot perform update operation on null object");
         try {
-            final FileWithContent fileWithContent = read(fileWithContentToUpdate.getUri())
-                    .orElse(create(fileWithContentToUpdate));
-            writeTextToFile(fileWithContent);
+            if (fileWithContentToUpdate.file.exists()) {
+                writeTextToFile(fileWithContentToUpdate);
+            } else {
+                create(fileWithContentToUpdate);
+            }
         } catch (IOException e) {
             throw new ServiceException(e.getMessage(), e);
         }
