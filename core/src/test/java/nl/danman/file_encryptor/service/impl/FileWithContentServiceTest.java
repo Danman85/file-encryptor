@@ -8,6 +8,7 @@ import nl.danman.file_encryptor.service.ServiceException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -15,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -160,21 +162,23 @@ public class FileWithContentServiceTest {
     }
 
     @Test
-    void update_updatesContent_forGivenFileWithContent() throws ServiceException, IOException {
+    void update_updatesContent_forGivenFileWithContent(@TempDir Path tempDir) throws ServiceException, IOException,
+            RepositoryException {
         // Given
-        final FileWithContent newFile = new FileWithContent(
-                this.fileWithContent.file.getAbsolutePath(), this.fileWithContent.content);
-        doNothing().when(this.fileWithContentServiceSpy).writeTextToFile(any(FileWithContent.class));
-        doReturn(Optional.of(newFile)).when(this.fileWithContentServiceSpy).read(anyString());
+        final File persistedFile = tempDir.resolve(fileWithContent.file.toPath()).toFile();
+        persistedFile.createNewFile();
+        final FileWithContent oldFile = new FileWithContent(persistedFile.getAbsolutePath(), "old");
+        final FileWithContent fileToUpdate = new FileWithContent(persistedFile.getAbsolutePath(), "updated");
+        when(this.fileRepositoryMock.read(eq(persistedFile.getAbsolutePath()))).thenReturn(persistedFile);
+        doCallRealMethod().when(fileWithContentServiceSpy).writeTextToFile(any());
 
         // When
-        final FileWithContent updatedFile = this.fileWithContentServiceSpy.update(this.fileWithContent);
+        final FileWithContent updatedFile = this.fileWithContentServiceSpy.update(fileToUpdate);
 
         // Then
         assertNotNull(updatedFile);
-        assertNotSame(this.fileWithContent, updatedFile);
-        verify(this.fileWithContentServiceSpy).writeTextToFile(this.fileWithContent);
-        verify(this.fileWithContentServiceSpy, times(2)).read(this.fileWithContent.file.getAbsolutePath());
+        assertEquals(oldFile.file.getAbsolutePath(), updatedFile.file.getAbsolutePath());
+        assertEquals("updated", updatedFile.content);
     }
 
     @Test
@@ -188,9 +192,8 @@ public class FileWithContentServiceTest {
     }
 
     @Test
-    void update_ThrowsServiceException_whenFileUtilsThrowsIOException() throws IOException, RepositoryException {
+    void update_ThrowsServiceException_whenFileUtilsThrowsIOException() throws IOException {
         // Given
-        when(this.fileRepositoryMock.read(anyString())).thenReturn(this.fileWithContent.file);
         doThrow(new IOException(EXCEPTION_MESSAGE)).when(this.fileWithContentServiceSpy).writeTextToFile(this.fileWithContent);
 
         // When
@@ -200,6 +203,26 @@ public class FileWithContentServiceTest {
         // Then
         assertEquals(EXCEPTION_MESSAGE, thrown.getMessage());
         assertInstanceOf(IOException.class, thrown.getCause());
+    }
+
+    @Test
+    void update_createsNewFileWhenItDoesNotExist(@TempDir Path tempDir) throws RepositoryException, IOException,
+            ServiceException {
+        // Given
+        final File fileToBeCreated = tempDir.resolve("lala.txt").toFile();
+        final FileWithContent toBeUpdated = new FileWithContent(fileToBeCreated.getAbsolutePath(), "updated");
+        when(this.fileRepositoryMock.read(eq(fileToBeCreated.getAbsolutePath()))).thenReturn(fileToBeCreated);
+        doCallRealMethod().when(fileWithContentServiceSpy).writeTextToFile(any());
+
+        // When
+        final FileWithContent newlyCreated = fileWithContentServiceSpy.update(toBeUpdated);
+
+        // Then
+        assertNotNull(newlyCreated);
+        assertEquals(fileToBeCreated.getAbsolutePath(), newlyCreated.file.getAbsolutePath());
+        assertEquals("updated", newlyCreated.content);
+        verify(fileWithContentServiceSpy).create(eq(toBeUpdated));
+        verify(fileWithContentServiceSpy).read(eq(toBeUpdated.getUri()));
     }
 
     @Test
